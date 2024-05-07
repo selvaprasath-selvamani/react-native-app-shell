@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 /**
  * Sample React Native App
  * https://github.com/facebook/react-native
@@ -5,39 +6,66 @@
  * @format
  */
 
-import React, {useRef} from 'react';
+import React, {createContext, useCallback, useEffect, useState} from 'react';
+import {Linking, SafeAreaView} from 'react-native';
+import {Camera} from 'react-native-vision-camera';
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
-import {Button, View} from 'react-native';
+import AppCamera from '@src/screens/RNCamera/Camera';
+import WebApp from '@src/screens/WebView/WebApp';
+import Location from '@src/screens/Location/Location';
+import {Routes} from '@src/Routes/Routes';
 
-import {WebView} from 'react-native-webview';
-
-//Refer only App.tsx for the communication between React native and Next js
+const Stack = createNativeStackNavigator<Routes>();
 
 function App(): React.JSX.Element {
-  const webViewRef = useRef(null);
-  function onMessage(data: any) {
-    console.log('Data sent to React Native from Webview', data);
-  }
+  const cameraPermission = Camera.getCameraPermissionStatus();
 
-  function sendDataToWebView() {
-    webViewRef?.current?.postMessage('Hi');
-  }
+  const requestCameraPermission = useCallback(async () => {
+    console.log('Requesting camera permission...');
+    const permission = await Camera.requestCameraPermission();
+    console.log(`Camera permission status: ${permission}`);
+
+    if (permission === 'denied') {
+      await Linking.openSettings();
+    }
+  }, []);
+  const AppContext = createContext<{
+    action: string;
+    setAction: React.Dispatch<React.SetStateAction<string>>;
+  }>({
+    action: '',
+    setAction: () => {},
+  });
+  const [action, setAction] = useState<string>('');
+  useEffect(() => {
+    if (cameraPermission !== 'not-determined') {
+      requestCameraPermission();
+    }
+  }, [cameraPermission, requestCameraPermission]);
 
   return (
-    <View style={{flex: 1}}>
-      <WebView
-        ref={webViewRef}
-        source={{uri: 'http://10.0.2.2:3000'}}
-        onMessage={onMessage}
-        javaScriptEnabled={true}
-      />
-      <Button
-        title="Send Message to WebView"
-        onPress={() => {
-          sendDataToWebView();
-        }}
-      />
-    </View>
+    <SafeAreaView
+      style={{
+        flex: 1,
+      }}>
+      <AppContext.Provider value={{action, setAction}}>
+        <NavigationContainer>
+          <Stack.Navigator
+            screenOptions={{
+              headerShown: false,
+              statusBarStyle: 'dark',
+              animationTypeForReplace: 'push',
+            }}
+            initialRouteName={'Location'}>
+            <Stack.Screen name="CameraPage" component={AppCamera} />
+            <Stack.Screen name="Next" component={WebApp} />
+            <Stack.Screen name="Location" component={Location} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </AppContext.Provider>
+    </SafeAreaView>
   );
 }
 

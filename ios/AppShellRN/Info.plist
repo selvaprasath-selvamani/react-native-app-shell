@@ -47,6 +47,10 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
-	<false/>
+	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>$(PRODUCT_NAME) needs access to your Camera.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+  	<string>$(PRODUCT_NAME) needs access to your Location</string>
 </dict>
 </plist>
