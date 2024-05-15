@@ -7,14 +7,9 @@
  */
 
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import React, {useEffect, useRef} from 'react';
+import React, {useCallback, useEffect, useRef} from 'react';
 
-import {
-  // Button,
-  Platform,
-  StatusBar,
-  View,
-} from 'react-native';
+import {View} from 'react-native';
 
 import {WebView} from 'react-native-webview';
 import {Routes} from '../../Routes/Routes';
@@ -37,22 +32,44 @@ const WebApp: React.FC<NativeStackScreenProps<Routes, 'Next'>> = ({
     }
   }
 
-  function sendDataToWebView(dataVal: string) {
-    webViewRef?.current?.postMessage(dataVal);
-  }
+  // function sendDataToWebView(dataVal: string) {
+  //   webViewRef?.current?.postMessage(dataVal);
+  // }
+
+  const sendDataToWebVieww = useCallback(() => {
+    if (!data || data?.length <= 1) {
+      return null;
+    } else {
+      const formatedData: {
+        productId: number;
+        image: string;
+        caption: string;
+        tag: string;
+        launchDate: string;
+        category: string;
+        collection: string;
+      } = JSON.parse(data);
+
+      console.log(formatedData, typeof formatedData, formatedData.productId);
+      webViewRef?.current?.postMessage(JSON.stringify(formatedData?.productId));
+    }
+  }, [data]);
+
   useEffect(() => {
-    data && data?.length > 1 && sendDataToWebView(data);
-  }, [data, navigation, route.key]);
+    sendDataToWebVieww();
+    // data && data?.length > 1 && sendDataToWebView(data);
+  }, [data, sendDataToWebVieww]);
 
   return (
     <View
       style={{
         flex: 1,
-        paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+        // paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
       }}>
       <WebView
         ref={webViewRef}
         source={{uri: 'http://10.0.2.2:3000'}}
+        // source={{uri: 'https://ct-poc-web.vercel.app/'}}
         onMessage={onMessage}
         javaScriptEnabled={true}
       />

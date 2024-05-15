@@ -12,10 +12,10 @@ import {Camera} from 'react-native-vision-camera';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
-import AppCamera from '@src/screens/RNCamera/Camera';
-import WebApp from '@src/screens/WebView/WebApp';
-import Location from '@src/screens/Location/Location';
-import {Routes} from '@src/Routes/Routes';
+import AppCamera from './src/screens/RNCamera/Camera';
+import WebApp from './src/screens/WebView/WebApp';
+import Location from './src/screens/Location/Location';
+import {Routes} from './src/Routes/Routes';
 
 const Stack = createNativeStackNavigator<Routes>();
 
@@ -58,7 +58,7 @@ function App(): React.JSX.Element {
               statusBarStyle: 'dark',
               animationTypeForReplace: 'push',
             }}
-            initialRouteName={'Location'}>
+            initialRouteName={'Next'}>
             <Stack.Screen name="CameraPage" component={AppCamera} />
             <Stack.Screen name="Next" component={WebApp} />
             <Stack.Screen name="Location" component={Location} />
